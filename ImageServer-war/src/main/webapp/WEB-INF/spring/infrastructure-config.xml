@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<tx:annotation-driven />
+	<!-- 配置 dbcp 数据库连接池 Hibernate支持 -->
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
+		destroy-method="close"> <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"> 
+		</property> <property name="driverClassName" value="com.p6spy.engine.spy.P6SpyDriver"> 
+		</property> <property name="url" value="jdbc:oracle:thin:@192.168.0.205:1521:orcl"> 
+		</property> <property name="username" value="mris"></property> <property 
+		name="password" value="mris"></property> </bean> -->
+
+	<!-- 配置 BoneCP 数据库连接池 Hibernate支持 -->
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${driverClassName}" />
+		<property name="jdbcUrl" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+
+		<property name="partitionCount" value="${partitionCount}" />
+		<property name="maxConnectionsPerPartition" value="${maxConnectionsPerPartition}" />
+		<property name="minConnectionsPerPartition" value="${minConnectionsPerPartition}" />
+		<property name="acquireIncrement" value="${acquireIncrement}" />
+		<property name="poolAvailabilityThreshold" value="${poolAvailabilityThreshold}" />
+		<property name="connectionTimeout" value="${connectionTimeout}" />
+
+		<property name="releaseHelperThreads" value="${releaseHelperThreads}" />
+		<property name="statementReleaseHelperThreads" value="${statementReleaseHelperThreads}" />
+		<property name="maxConnectionAge" value="${maxConnectionAge}" />
+		<property name="idleMaxAge" value="${idleMaxAge}" />
+		<property name="idleConnectionTestPeriod" value="${idleConnectionTestPeriod}" />
+
+		<property name="acquireRetryAttempts" value="${acquireRetryAttempts}" />
+		<property name="acquireRetryDelay" value="${acquireRetryDelay}" />
+		<property name="lazyInit" value="${lazyInit}" />
+		<property name="statementCacheSize" value="${statementCacheSize}" />
+		<property name="disableJMX" value="${disableJMX}" />
+		<property name="poolName" value="${poolName}" />
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider_class}</prop>
+				<prop key="hibernate.jdbc.batch_size">25</prop>
+				<prop key="hibernate.jdbc.fetch_size">50</prop>
+				<prop key="hibernate.max_fetch_depth">3</prop>
+			</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>cn.ac.sitp.lmi.escience.project.entity</value>
+				<value>cn.ac.sitp.lmi.escience.rbac.entity</value>
+				<value>cn.ac.sitp.lmi.escience.sample.entity</value>
+				<value>cn.ac.sitp.lmi.escience.xds.entity</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- 事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref local="sessionFactory" />
+		</property>
+	</bean>
+	<!-- 配置事务特性，配置add，delete，update开始的方法，事务传播特性为required
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="find*" propagation="REQUIRED" />
+			<tx:method name="find*" propagation="REQUIRED" />
+			<tx:method name="get*" read-only="true" />
+		</tx:attributes>
+	</tx:advice> -->
+	<!-- 配置那些类的方法进行事务管理，当前com.sy.crm.service包中的子包， 类中所有方法需要，还需要参考tx:advice的设置
+	<aop:config>
+		<aop:pointcut id="allManagerMethod"
+			expression="execution(*
+    cn.ac.sitp.lmi.escience.*.service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod" />
+	</aop:config>
+
+	<aop:config>
+		<aop:pointcut
+			expression="execution(*
+    cn.ac.sitp.lmi.escience.common.service.impl.FlexUserDetailsService.*(..))"
+			id="allLoginMethod" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="allLoginMethod" />
+	</aop:config> -->
+
+</beans>

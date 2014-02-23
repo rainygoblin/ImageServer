@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host">
+			<value>${host}</value>
+		</property>
+		<property name="username">
+			<value>${mail.username}</value>
+		</property>
+		<property name="password">
+			<value>${mail.password}</value>
+		</property>
+		<property name="port">
+			<value>${port}</value>
+		</property>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
+				<prop key="mail.smtp.timeout">${mail.smtp.timeout}</prop>
+				<prop key="mail.smtp.starttls.enable">${mail.smtp.starttls.enable}</prop>
+				<prop key="mail.smtp.socketFactory.class">${mail.smtp.socketFactory.class}</prop>
+				<prop key="mail.smtp.socketFactory.fallback">${mail.smtp.socketFactory.fallback}</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="from">
+			<value>${from}</value>
+		</property>
+		<property name="subject">
+			<value>${subject}</value>
+		</property>
+		<property name="text">
+			<value>${text}</value>
+		</property>
+	</bean>
+	<bean id="sendmail"
+		class="cn.ac.sitp.lmi.escience.common.service.impl.SendMailManagerServiceImpl">
+		<property name="mailSender" ref="mailSender"></property>
+		<property name="message" ref="mailMessage"></property>
+	</bean>
+
+
+</beans>
